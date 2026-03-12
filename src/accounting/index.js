@@ -32,26 +32,27 @@ async function handleTotal() {
   console.log(`Current balance: ${formatMoney(balance)}`);
 }
 
-async function handleCredit() {
-  const input = await prompt('Enter credit amount: ');
+async function handleCredit(amountInput) {
+  const input = amountInput ?? (await prompt('Enter credit amount: '));
   const amount = Number(input);
   if (Number.isNaN(amount) || amount <= 0) {
     console.log('Invalid amount. Enter a positive number.');
-    return;
+    return false;
   }
 
   const current = readBalance();
   const updated = current + amount;
   writeBalance(updated);
   console.log(`Amount credited. New balance: ${formatMoney(updated)}`);
+  return true;
 }
 
-async function handleDebit() {
-  const input = await prompt('Enter debit amount: ');
+async function handleDebit(amountInput) {
+  const input = amountInput ?? (await prompt('Enter debit amount: '));
   const amount = Number(input);
   if (Number.isNaN(amount) || amount <= 0) {
     console.log('Invalid amount. Enter a positive number.');
-    return;
+    return false;
   }
 
   const current = readBalance();
@@ -59,8 +60,10 @@ async function handleDebit() {
     const updated = current - amount;
     writeBalance(updated);
     console.log(`Amount debited. New balance: ${formatMoney(updated)}`);
+    return true;
   } else {
     console.log('Insufficient funds for this debit.');
+    return false;
   }
 }
 
@@ -98,6 +101,20 @@ async function main() {
 
   rl.close();
 }
+
+function resetBalance(value = 1000.0) {
+  storageBalance = value;
+}
+
+module.exports = {
+  readBalance,
+  writeBalance,
+  handleTotal,
+  handleCredit,
+  handleDebit,
+  resetBalance,
+  main,
+};
 
 if (require.main === module) {
   main().catch((err) => {
